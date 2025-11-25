@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Your daily moments in 140 words. Write, reflect, and track your mood.">
-  <title>DayBrief - Your Daily Diary</title>
+  <meta name="description" content="Your day in ninety-nine words. One less than perfect, just like life.">
+  <title>NinetyNine Words</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📔</text></svg>">
   <style>
     * {
@@ -14,16 +14,10 @@
     }
     
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       padding: 20px;
-    }
-    
-    @media (max-width: 768px) {
-      body {
-        padding: 10px;
-      }
     }
     
     .container {
@@ -40,94 +34,19 @@
       text-align: center;
     }
     
-    @media (max-width: 768px) {
-      .header {
-        padding: 20px;
-      }
-    }
-    
     h1 { 
       color: #333;
       font-size: 32px;
       margin-bottom: 10px;
     }
     
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 24px;
-      }
-    }
-    
     .tagline {
       color: #666;
       font-size: 16px;
     }
-
-    .welcome-message {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      color: white;
-      padding: 25px;
-      border-radius: 16px;
-      margin-bottom: 20px;
-      text-align: center;
-      animation: fadeIn 0.5s ease;
-    }
-
-    .welcome-message h2 {
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
-
-    .welcome-message p {
-      opacity: 0.95;
-      line-height: 1.6;
-    }
-
-    .welcome-message button {
-      background: white;
-      color: #4facfe;
-      padding: 10px 25px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 15px;
-      transition: transform 0.2s;
-    }
-
-    .welcome-message button:hover {
-      transform: scale(1.05);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
     
-    .streak-counter {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin: 20px 0;
-      text-align: center;
-    }
-    
-    .streak-number {
-      font-size: 48px;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-
-    @media (max-width: 768px) {
-      .streak-number {
-        font-size: 36px;
-      }
-    }
-    
-    .streak-label {
-      font-size: 14px;
-      opacity: 0.9;
+    .tagline strong {
+      color: #764ba2;
     }
     
     .write-section {
@@ -136,12 +55,6 @@
       border-radius: 16px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.1);
       margin-bottom: 20px;
-    }
-
-    @media (max-width: 768px) {
-      .write-section {
-        padding: 20px;
-      }
     }
 
     .mood-selector {
@@ -171,7 +84,6 @@
       background: white;
       cursor: pointer;
       transition: all 0.2s;
-      min-width: 60px;
     }
 
     .mood-btn:hover {
@@ -213,7 +125,7 @@
       font-weight: bold;
     }
     
-    button.save-btn { 
+    .save-btn { 
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white; 
       padding: 14px 35px; 
@@ -227,12 +139,12 @@
       width: 100%;
     }
     
-    button.save-btn:hover { 
+    .save-btn:hover { 
       transform: translateY(-2px);
       box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
     }
     
-    button.save-btn:active {
+    .save-btn:active {
       transform: translateY(0);
     }
     
@@ -247,22 +159,10 @@
       margin-bottom: 15px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.1);
     }
-
-    @media (max-width: 768px) {
-      .entries-header {
-        padding: 15px 20px;
-      }
-    }
     
     .entries-header h2 {
       color: #333;
       font-size: 24px;
-    }
-
-    @media (max-width: 768px) {
-      .entries-header h2 {
-        font-size: 20px;
-      }
     }
     
     .entry { 
@@ -273,12 +173,6 @@
       box-shadow: 0 5px 20px rgba(0,0,0,0.08);
       border-left: 5px solid #667eea;
       transition: transform 0.2s;
-    }
-
-    @media (max-width: 768px) {
-      .entry {
-        padding: 15px;
-      }
     }
     
     .entry:hover {
@@ -313,7 +207,6 @@
       font-size: 12px;
       cursor: pointer;
       transition: all 0.2s;
-      margin: 0;
     }
 
     .delete-btn:hover {
@@ -336,90 +229,6 @@
       font-style: italic;
     }
 
-    @media (max-width: 768px) {
-      .no-entries {
-        padding: 30px 20px;
-      }
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-top: 15px;
-    }
-
-    .stat-box {
-      background: rgba(255,255,255,0.2);
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-    }
-
-    .stat-number {
-      font-size: 28px;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    @media (max-width: 768px) {
-      .stat-number {
-        font-size: 24px;
-      }
-    }
-
-    .stat-label {
-      font-size: 12px;
-      opacity: 0.9;
-    }
-
-    .mood-stats {
-      background: white;
-      padding: 20px;
-      border-radius: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
-
-    @media (max-width: 768px) {
-      .mood-stats {
-        padding: 15px;
-      }
-    }
-
-    .mood-stats h3 {
-      color: #333;
-      font-size: 18px;
-      margin-bottom: 15px;
-    }
-
-    .mood-breakdown {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .mood-item {
-      flex: 1;
-      min-width: 70px;
-      text-align: center;
-      padding: 10px;
-      background: #f8f9fa;
-      border-radius: 8px;
-    }
-
-    .mood-item-emoji {
-      font-size: 24px;
-      margin-bottom: 5px;
-    }
-
-    .mood-item-count {
-      font-size: 18px;
-      font-weight: bold;
-      color: #333;
-    }
-
     .footer {
       text-align: center;
       color: white;
@@ -428,46 +237,13 @@
       font-size: 14px;
       margin-top: 40px;
     }
-
-    .footer a {
-      color: white;
-      text-decoration: underline;
-    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>📔 DayBrief</h1>
-      <p class="tagline">Your daily moments in 140 words</p>
-    </div>
-
-    <div id="welcomeMessage" class="welcome-message" style="display: none;">
-      <h2>✨ Welcome to DayBrief!</h2>
-      <p>A simple space to capture your daily thoughts in 140 words or less. Pick your mood, write freely, and watch your streak grow. Your entries are private and saved securely in your browser.</p>
-      <button onclick="dismissWelcome()">Get Started</button>
-    </div>
-
-    <div class="streak-counter">
-      <div class="streak-label">🔥 CURRENT STREAK</div>
-      <div class="streak-number" id="streakNumber">0</div>
-      <div class="streak-label">days in a row</div>
-      
-      <div class="stats">
-        <div class="stat-box">
-          <div class="stat-number" id="totalEntries">0</div>
-          <div class="stat-label">Total Entries</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-number" id="longestStreak">0</div>
-          <div class="stat-label">Longest Streak</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="mood-stats" id="moodStats" style="display: none;">
-      <h3>😊 Your Mood This Week</h3>
-      <div class="mood-breakdown" id="moodBreakdown"></div>
+      <h1>📔 NinetyNine Words</h1>
+      <p class="tagline">Your day in ninety-nine words.<br><strong>One less than perfect, just like life.</strong></p>
     </div>
 
     <div class="write-section">
@@ -483,35 +259,22 @@
         </div>
       </div>
 
-      <textarea id="diaryEntry" placeholder="How was your day? What happened? How did you feel?" aria-label="Diary entry"></textarea>
-      <div class="word-count" id="wordCount">0 / 140 words</div>
+      <textarea id="diaryEntry" placeholder="How was your day? What happened? How did you feel?"></textarea>
+      <div class="word-count" id="wordCount">0 / 99 words</div>
       <button class="save-btn" onclick="saveEntry()">💾 Save Entry</button>
     </div>
 
     <div class="entries" id="entriesList"></div>
 
     <div class="footer">
-      Made with ❤️ for daily reflection<br>
-      Your data stays private in your browser
+      NinetyNine Words - 99 words or less. One less than perfect.
     </div>
   </div>
 
   <script>
     let selectedMood = null;
 
-    // Check if first time user
-    function checkFirstVisit() {
-      const hasVisited = localStorage.getItem('hasVisited');
-      if (!hasVisited) {
-        document.getElementById('welcomeMessage').style.display = 'block';
-        localStorage.setItem('hasVisited', 'true');
-      }
-    }
-
-    function dismissWelcome() {
-      document.getElementById('welcomeMessage').style.display = 'none';
-    }
-
+    // Select mood when user clicks emoji
     function selectMood(mood) {
       selectedMood = mood;
       
@@ -521,134 +284,34 @@
       event.target.classList.add('selected');
     }
 
+    // Count words as user types
     document.getElementById('diaryEntry').addEventListener('input', function() {
       const text = this.value.trim();
       const words = text === '' ? 0 : text.split(/\s+/).length;
       const counter = document.getElementById('wordCount');
       
-      if (words > 140) {
+      if (words > 99) {
         counter.classList.add('warning');
-        counter.textContent = words + ' / 140 words - Too many words!';
+        counter.textContent = words + ' / 99 words - Too many words!';
       } else {
         counter.classList.remove('warning');
-        counter.textContent = words + ' / 140 words';
+        counter.textContent = words + ' / 99 words';
       }
     });
 
-    function calculateStreak() {
-      const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
-      
-      if (entries.length === 0) {
-        return { current: 0, longest: 0 };
-      }
-
-      const dates = entries.map(entry => {
-        const date = new Date(entry.timestamp);
-        return date.toISOString().split('T')[0];
-      });
-
-      const uniqueDates = [...new Set(dates)].sort().reverse();
-      
-      let currentStreak = 0;
-      let longestStreak = 0;
-      let tempStreak = 1;
-      
-      const today = new Date().toISOString().split('T')[0];
-      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-      
-      if (uniqueDates[0] === today || uniqueDates[0] === yesterday) {
-        currentStreak = 1;
-        
-        for (let i = 1; i < uniqueDates.length; i++) {
-          const prevDate = new Date(uniqueDates[i - 1]);
-          const currDate = new Date(uniqueDates[i]);
-          const diffDays = (prevDate - currDate) / (1000 * 60 * 60 * 24);
-          
-          if (diffDays === 1) {
-            currentStreak++;
-            tempStreak++;
-          } else {
-            break;
-          }
-        }
-      }
-      
-      tempStreak = 1;
-      for (let i = 1; i < uniqueDates.length; i++) {
-        const prevDate = new Date(uniqueDates[i - 1]);
-        const currDate = new Date(uniqueDates[i]);
-        const diffDays = (prevDate - currDate) / (1000 * 60 * 60 * 24);
-        
-        if (diffDays === 1) {
-          tempStreak++;
-          longestStreak = Math.max(longestStreak, tempStreak);
-        } else {
-          tempStreak = 1;
-        }
-      }
-      
-      longestStreak = Math.max(longestStreak, currentStreak);
-      
-      return { current: currentStreak, longest: longestStreak };
-    }
-
-    function updateMoodStats() {
-      const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
-      
-      if (entries.length === 0) {
-        document.getElementById('moodStats').style.display = 'none';
-        return;
-      }
-
-      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-      const recentEntries = entries.filter(entry => 
-        new Date(entry.timestamp) > weekAgo
-      );
-
-      if (recentEntries.length === 0) {
-        document.getElementById('moodStats').style.display = 'none';
-        return;
-      }
-
-      const moodCounts = {};
-      recentEntries.forEach(entry => {
-        if (entry.mood) {
-          moodCounts[entry.mood] = (moodCounts[entry.mood] || 0) + 1;
-        }
-      });
-
-      const allMoods = ['😊', '😐', '😢', '😤', '😴', '🤔'];
-      const breakdown = allMoods.map(mood => `
-        <div class="mood-item">
-          <div class="mood-item-emoji">${mood}</div>
-          <div class="mood-item-count">${moodCounts[mood] || 0}</div>
-        </div>
-      `).join('');
-
-      document.getElementById('moodBreakdown').innerHTML = breakdown;
-      document.getElementById('moodStats').style.display = 'block';
-    }
-
-    function updateStreakDisplay() {
-      const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
-      const streak = calculateStreak();
-      
-      document.getElementById('streakNumber').textContent = streak.current;
-      document.getElementById('totalEntries').textContent = entries.length;
-      document.getElementById('longestStreak').textContent = streak.longest;
-    }
-
+    // Save entry to localStorage
     function saveEntry() {
       const text = document.getElementById('diaryEntry').value.trim();
       const words = text === '' ? 0 : text.split(/\s+/).length;
       
+      // Validation
       if (text === '') {
         alert('✍️ Write something first!');
         return;
       }
       
-      if (words > 140) {
-        alert('📝 Please keep it under 140 words!');
+      if (words > 99) {
+        alert('📝 Please keep it under 99 words!');
         return;
       }
 
@@ -657,9 +320,11 @@
         return;
       }
       
+      // Get existing entries
       let entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
       
-      entries.unshift({
+      // Create new entry
+      const newEntry = {
         id: Date.now(),
         text: text,
         mood: selectedMood,
@@ -673,24 +338,29 @@
           minute: '2-digit'
         }),
         words: words
-      });
+      };
       
+      // Add to beginning of array
+      entries.unshift(newEntry);
+      
+      // Save to localStorage
       localStorage.setItem('diaryEntries', JSON.stringify(entries));
       
+      // Clear form
       document.getElementById('diaryEntry').value = '';
-      document.getElementById('wordCount').textContent = '0 / 140 words';
+      document.getElementById('wordCount').textContent = '0 / 99 words';
       selectedMood = null;
       document.querySelectorAll('.mood-btn').forEach(btn => {
         btn.classList.remove('selected');
       });
       
+      // Refresh display
       displayEntries();
-      updateStreakDisplay();
-      updateMoodStats();
       
       alert('✅ Entry saved successfully!');
     }
 
+    // Delete entry
     function deleteEntry(id) {
       if (!confirm('Are you sure you want to delete this entry?')) {
         return;
@@ -701,12 +371,11 @@
       localStorage.setItem('diaryEntries', JSON.stringify(entries));
       
       displayEntries();
-      updateStreakDisplay();
-      updateMoodStats();
       
       alert('🗑️ Entry deleted!');
     }
 
+    // Display all entries
     function displayEntries() {
       const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
       const container = document.getElementById('entriesList');
@@ -714,7 +383,7 @@
       if (entries.length === 0) {
         container.innerHTML = `
           <div class="no-entries">
-            No entries yet. Start your journey today! ✨
+            No entries yet. Start writing! ✨
           </div>
         `;
         return;
@@ -740,11 +409,8 @@
       `).join('');
     }
 
-    // Initialize
-    checkFirstVisit();
+    // Load entries when page loads
     displayEntries();
-    updateStreakDisplay();
-    updateMoodStats();
   </script>
 </body>
 </html>
