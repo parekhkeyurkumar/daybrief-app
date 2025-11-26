@@ -13,40 +13,111 @@
       box-sizing: border-box;
     }
     
-    body { 
+    body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
-      padding: 20px;
+      padding: 0;
+      padding-top: 80px; /* Space for fixed header on mobile */
     }
-    
+
     .container {
       max-width: 700px;
       margin: 0 auto;
+      padding: 20px;
     }
-    
+
     .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
       background: white;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 998;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .header.scrolled {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .header-content {
+      max-width: 700px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      gap: 16px;
+    }
+
+    .header-branding {
+      flex: 1;
       text-align: center;
     }
     
-    h1 { 
+    h1 {
       color: #333;
-      font-size: 32px;
-      margin-bottom: 10px;
+      font-size: 20px;
+      margin: 0;
+      font-weight: 700;
     }
-    
+
     .tagline {
       color: #666;
-      font-size: 16px;
+      font-size: 13px;
+      margin-top: 4px;
+      display: none; /* Hidden on mobile by default */
     }
-    
+
     .tagline strong {
       color: #764ba2;
+    }
+
+    /* Integrated Hamburger Button */
+    .hamburger-btn {
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      transition: all 0.2s;
+      border-radius: 8px;
+      min-width: 40px;
+      height: 40px;
+    }
+
+    .hamburger-btn:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+    }
+
+    .hamburger-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Desktop styles */
+    @media (min-width: 768px) {
+      body {
+        padding-top: 120px; /* More space for taller desktop header */
+      }
+
+      .header-content {
+        padding: 24px 20px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .tagline {
+        display: block; /* Show taglines on desktop */
+        font-size: 14px;
+      }
     }
     
     .write-section {
@@ -433,35 +504,7 @@
       margin-top: 40px;
     }
 
-    /* Hamburger Menu */
-    .hamburger-btn {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: rgba(255, 255, 255, 0.95);
-      border: none;
-      border-radius: 12px;
-      width: 50px;
-      height: 50px;
-      font-size: 24px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      transition: all 0.2s;
-      color: #667eea;
-    }
-
-    .hamburger-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
-    }
-
-    .hamburger-btn:active {
-      transform: scale(0.95);
-    }
+    /* Old hamburger styles removed - now integrated in header */
 
     /* Sidebar */
     .sidebar {
@@ -616,8 +659,16 @@
   </style>
 </head>
 <body>
-  <!-- Hamburger Menu Button -->
-  <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+  <!-- Unified Sticky Header -->
+  <div class="header" id="stickyHeader">
+    <div class="header-content">
+      <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+      <div class="header-branding">
+        <h1>📔 NinetyNine Words</h1>
+        <p class="tagline">Your day in ninety-nine words.<br><strong>One less than perfect, just like life.</strong></p>
+      </div>
+    </div>
+  </div>
 
   <!-- Backdrop -->
   <div class="backdrop" onclick="closeSidebar()"></div>
@@ -646,10 +697,6 @@
   <div class="container">
     <!-- Capture View (Default) -->
     <div class="view-section active" id="captureView">
-      <div class="header">
-        <h1>📔 NinetyNine Words</h1>
-        <p class="tagline">Your day in ninety-nine words.<br><strong>One less than perfect, just like life.</strong></p>
-      </div>
 
       <div class="write-section">
       <div class="mood-selector">
@@ -704,6 +751,16 @@
     let editingEntryId = null;
     let editingMood = null;
     let currentView = 'capture';
+
+    // Scroll shadow effect for sticky header
+    window.addEventListener('scroll', function() {
+      const header = document.getElementById('stickyHeader');
+      if (window.scrollY > 10) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
 
     // Sidebar functions
     function toggleSidebar() {
