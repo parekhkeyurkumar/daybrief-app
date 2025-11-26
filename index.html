@@ -272,6 +272,22 @@
       font-size: 24px;
     }
 
+    .edit-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .edit-btn:hover {
+      background: #764ba2;
+      transform: scale(1.05);
+    }
+
     .delete-btn {
       background: #ff4757;
       color: white;
@@ -286,6 +302,108 @@
     .delete-btn:hover {
       background: #ee5a6f;
       transform: scale(1.05);
+    }
+
+    .save-edit-btn {
+      background: #10ac84;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .save-edit-btn:hover {
+      background: #0e9770;
+      transform: scale(1.05);
+    }
+
+    .cancel-edit-btn {
+      background: #999;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .cancel-edit-btn:hover {
+      background: #777;
+      transform: scale(1.05);
+    }
+
+    .entry.editing {
+      border-left-color: #10ac84;
+    }
+
+    .entry-edit-textarea {
+      width: 100%;
+      min-height: 100px;
+      font-size: 15px;
+      padding: 12px;
+      border: 2px solid #667eea;
+      border-radius: 8px;
+      font-family: inherit;
+      resize: vertical;
+      margin-bottom: 10px;
+    }
+
+    .entry-edit-textarea:focus {
+      outline: none;
+      border-color: #764ba2;
+    }
+
+    .entry-edit-word-count {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .entry-edit-word-count.warning {
+      color: #f5576c;
+      font-weight: bold;
+    }
+
+    .entry-mood-selector {
+      margin-bottom: 15px;
+    }
+
+    .entry-mood-label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .entry-mood-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .entry-mood-btn {
+      font-size: 24px;
+      padding: 6px 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .entry-mood-btn:hover {
+      transform: scale(1.1);
+      border-color: #667eea;
+    }
+
+    .entry-mood-btn.selected {
+      border-color: #667eea;
+      background: #f0f4ff;
+      transform: scale(1.1);
     }
     
     .entry-text {
@@ -361,6 +479,8 @@
 
   <script>
     let selectedMood = null;
+    let editingEntryId = null;
+    let editingMood = null;
 
     // Mood to placeholder mapping
     const moodPlaceholders = {
@@ -499,6 +619,105 @@
       alert('✅ Entry saved successfully!');
     }
 
+    // Edit entry
+    function editEntry(id) {
+      // Prevent editing multiple entries at once
+      if (editingEntryId !== null && editingEntryId !== id) {
+        alert('⚠️ Please save or cancel the current edit first!');
+        return;
+      }
+
+      editingEntryId = id;
+      const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+      const entry = entries.find(e => e.id === id);
+
+      if (!entry) return;
+
+      editingMood = entry.mood;
+      displayEntries();
+    }
+
+    // Select mood for entry being edited
+    function selectEditMood(mood, entryId) {
+      editingMood = mood;
+
+      // Update button states
+      document.querySelectorAll(`[data-entry-mood-btn="${entryId}"]`).forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      event.target.classList.add('selected');
+    }
+
+    // Update word count for entry being edited
+    function updateEditWordCount(entryId) {
+      const textarea = document.getElementById(`edit-textarea-${entryId}`);
+      const counter = document.getElementById(`edit-word-count-${entryId}`);
+
+      const text = textarea.value.trim();
+      const words = text === '' ? 0 : text.split(/\s+/).length;
+
+      if (words > 99) {
+        counter.classList.add('warning');
+        counter.textContent = words + ' / 99 words - Too many words!';
+      } else {
+        counter.classList.remove('warning');
+        counter.textContent = words + ' / 99 words';
+      }
+    }
+
+    // Save edited entry
+    function saveEdit(id) {
+      const textarea = document.getElementById(`edit-textarea-${id}`);
+      const text = textarea.value.trim();
+      const words = text === '' ? 0 : text.split(/\s+/).length;
+
+      // Validation
+      if (text === '') {
+        alert('✍️ Entry cannot be empty!');
+        return;
+      }
+
+      if (words > 99) {
+        alert('📝 Please keep it under 99 words!');
+        return;
+      }
+
+      if (!editingMood) {
+        alert('😊 Pick a mood!');
+        return;
+      }
+
+      // Get existing entries
+      let entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+
+      // Find and update the entry
+      const entryIndex = entries.findIndex(e => e.id === id);
+      if (entryIndex !== -1) {
+        entries[entryIndex].text = text;
+        entries[entryIndex].mood = editingMood;
+        entries[entryIndex].words = words;
+      }
+
+      // Save to localStorage
+      localStorage.setItem('diaryEntries', JSON.stringify(entries));
+
+      // Reset editing state
+      editingEntryId = null;
+      editingMood = null;
+
+      // Refresh display
+      displayEntries();
+
+      alert('✅ Entry updated successfully!');
+    }
+
+    // Cancel edit
+    function cancelEdit() {
+      editingEntryId = null;
+      editingMood = null;
+      displayEntries();
+    }
+
     // Delete entry
     function deleteEntry(id) {
       if (!confirm('Are you sure you want to delete this entry?')) {
@@ -508,9 +727,9 @@
       let entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
       entries = entries.filter(entry => entry.id !== id);
       localStorage.setItem('diaryEntries', JSON.stringify(entries));
-      
+
       displayEntries();
-      
+
       alert('🗑️ Entry deleted!');
     }
 
@@ -567,20 +786,60 @@
         <div class="entries-header">
           <h2>📅 Your Days</h2>
         </div>
-      ` + entries.map(entry => `
-        <div class="entry">
-          <div class="entry-header">
-            <div>
-              <div class="entry-date">${entry.date} • ${entry.words} words</div>
+      ` + entries.map(entry => {
+        const isEditing = editingEntryId === entry.id;
+
+        if (isEditing) {
+          // Edit mode
+          return `
+            <div class="entry editing">
+              <div class="entry-header">
+                <div>
+                  <div class="entry-date">${entry.date}</div>
+                </div>
+              </div>
+              <div class="entry-mood-selector">
+                <div class="entry-mood-label">Pick your mood</div>
+                <div class="entry-mood-buttons">
+                  <button type="button" class="entry-mood-btn ${editingMood === '😊' ? 'selected' : ''}" data-entry-mood-btn="${entry.id}" onclick="selectEditMood('😊', ${entry.id})">😊</button>
+                  <button type="button" class="entry-mood-btn ${editingMood === '🤔' ? 'selected' : ''}" data-entry-mood-btn="${entry.id}" onclick="selectEditMood('🤔', ${entry.id})">🤔</button>
+                  <button type="button" class="entry-mood-btn ${editingMood === '😐' ? 'selected' : ''}" data-entry-mood-btn="${entry.id}" onclick="selectEditMood('😐', ${entry.id})">😐</button>
+                  <button type="button" class="entry-mood-btn ${editingMood === '😴' ? 'selected' : ''}" data-entry-mood-btn="${entry.id}" onclick="selectEditMood('😴', ${entry.id})">😴</button>
+                  <button type="button" class="entry-mood-btn ${editingMood === '😤' ? 'selected' : ''}" data-entry-mood-btn="${entry.id}" onclick="selectEditMood('😤', ${entry.id})">😤</button>
+                  <button type="button" class="entry-mood-btn ${editingMood === '😢' ? 'selected' : ''}" data-entry-mood-btn="${entry.id}" onclick="selectEditMood('😢', ${entry.id})">😢</button>
+                </div>
+              </div>
+              <textarea
+                id="edit-textarea-${entry.id}"
+                class="entry-edit-textarea"
+                oninput="updateEditWordCount(${entry.id})"
+              >${entry.text}</textarea>
+              <div id="edit-word-count-${entry.id}" class="entry-edit-word-count">${entry.words} / 99 words</div>
+              <div style="display: flex; gap: 10px;">
+                <button class="save-edit-btn" onclick="saveEdit(${entry.id})">💾 Save</button>
+                <button class="cancel-edit-btn" onclick="cancelEdit()">✖️ Cancel</button>
+              </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              ${entry.mood ? `<span class="entry-mood">${entry.mood}</span>` : ''}
-              <button class="delete-btn" onclick="deleteEntry(${entry.id})">🗑️ Delete</button>
+          `;
+        } else {
+          // Normal display mode
+          return `
+            <div class="entry">
+              <div class="entry-header">
+                <div>
+                  <div class="entry-date">${entry.date} • ${entry.words} words</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  ${entry.mood ? `<span class="entry-mood">${entry.mood}</span>` : ''}
+                  <button class="edit-btn" onclick="editEntry(${entry.id})">✏️ Edit</button>
+                  <button class="delete-btn" onclick="deleteEntry(${entry.id})">🗑️ Delete</button>
+                </div>
+              </div>
+              <div class="entry-text">${highlightText(entry.text, searchQuery)}</div>
             </div>
-          </div>
-          <div class="entry-text">${highlightText(entry.text, searchQuery)}</div>
-        </div>
-      `).join('');
+          `;
+        }
+      }).join('');
     }
 
     // Load entries when page loads
