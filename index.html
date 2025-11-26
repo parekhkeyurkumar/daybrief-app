@@ -269,7 +269,10 @@
     }
 
     .entry-mood {
-      font-size: 24px;
+      font-size: 28px;
+      margin-right: 15px;
+      cursor: help;
+      flex-shrink: 0;
     }
 
     .edit-btn {
@@ -490,6 +493,16 @@
       '😴': "Too tired to talk? Type instead.",
       '😤': "Let it out. No judgement.",
       '😢': "Want to get it off your chest?"
+    };
+
+    // Mood to name mapping for tooltips
+    const moodNames = {
+      '😊': "Happy",
+      '🤔': "Thoughtful",
+      '😐': "Neutral",
+      '😴': "Tired",
+      '😤': "Angry",
+      '😢': "Sad"
     };
 
     const defaultPlaceholder = "What's worth remembering today?";
@@ -826,11 +839,11 @@
           return `
             <div class="entry">
               <div class="entry-header">
-                <div>
+                ${entry.mood ? `<span class="entry-mood" title="${moodNames[entry.mood] || ''}">${entry.mood}</span>` : ''}
+                <div style="flex: 1;">
                   <div class="entry-date">${entry.date} • ${entry.words} words</div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                  ${entry.mood ? `<span class="entry-mood">${entry.mood}</span>` : ''}
                   <button class="edit-btn" onclick="editEntry(${entry.id})">✏️ Edit</button>
                   <button class="delete-btn" onclick="deleteEntry(${entry.id})">🗑️ Delete</button>
                 </div>
