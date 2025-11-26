@@ -656,6 +656,64 @@
       color: #666;
       font-weight: 500;
     }
+
+    /* Streak Counter */
+    .streak-counter {
+      background: linear-gradient(135deg, rgba(255, 183, 77, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
+      border: 2px solid rgba(255, 152, 0, 0.2);
+      border-radius: 12px;
+      padding: 16px 24px;
+      margin-bottom: 25px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .streak-counter.pulse {
+      animation: streakPulse 0.6s ease-out;
+    }
+
+    @keyframes streakPulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 5px 20px rgba(255, 152, 0, 0.3);
+      }
+    }
+
+    .streak-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #e65100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .streak-emoji {
+      font-size: 24px;
+      animation: flicker 2s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.8;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .streak-text {
+        font-size: 16px;
+      }
+      .streak-emoji {
+        font-size: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -699,6 +757,14 @@
     <div class="view-section active" id="captureView">
 
       <div class="write-section">
+      <!-- Streak Counter -->
+      <div class="streak-counter" id="streakCounter">
+        <div class="streak-text">
+          <span class="streak-emoji">🔥</span>
+          <span id="streakMessage">Start your streak today! 🔥</span>
+        </div>
+      </div>
+
       <div class="mood-selector">
         <div class="mood-label">Pick your mood</div>
         <div class="mood-buttons">
@@ -751,6 +817,119 @@
     let editingEntryId = null;
     let editingMood = null;
     let currentView = 'capture';
+
+    // Calculate current streak
+    function calculateStreak() {
+      const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+
+      if (entries.length === 0) {
+        return { streak: 0, hasEntryToday: false, hasEntryYesterday: false };
+      }
+
+      // Get all unique dates (YYYY-MM-DD format in local time)
+      const uniqueDates = new Set();
+      entries.forEach(entry => {
+        const date = new Date(entry.timestamp);
+        const dateStr = date.getFullYear() + '-' +
+                       String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                       String(date.getDate()).padStart(2, '0');
+        uniqueDates.add(dateStr);
+      });
+
+      // Convert to sorted array (most recent first)
+      const sortedDates = Array.from(uniqueDates).sort().reverse();
+
+      // Get today's date string
+      const today = new Date();
+      const todayStr = today.getFullYear() + '-' +
+                      String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                      String(today.getDate()).padStart(2, '0');
+
+      // Get yesterday's date string
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.getFullYear() + '-' +
+                          String(yesterday.getMonth() + 1).padStart(2, '0') + '-' +
+                          String(yesterday.getDate()).padStart(2, '0');
+
+      const hasEntryToday = sortedDates.includes(todayStr);
+      const hasEntryYesterday = sortedDates.includes(yesterdayStr);
+
+      // Calculate streak
+      let streak = 0;
+      const startDate = hasEntryToday ? todayStr : yesterdayStr;
+
+      // If no entry today or yesterday, streak is broken
+      if (!hasEntryToday && !hasEntryYesterday) {
+        return { streak: 0, hasEntryToday: false, hasEntryYesterday: false };
+      }
+
+      // Count consecutive days
+      let checkDate = new Date(startDate);
+      while (true) {
+        const checkDateStr = checkDate.getFullYear() + '-' +
+                            String(checkDate.getMonth() + 1).padStart(2, '0') + '-' +
+                            String(checkDate.getDate()).padStart(2, '0');
+
+        if (sortedDates.includes(checkDateStr)) {
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+
+      return { streak, hasEntryToday, hasEntryYesterday };
+    }
+
+    // Update streak display
+    function updateStreakDisplay(animate = false) {
+      const { streak, hasEntryToday, hasEntryYesterday } = calculateStreak();
+      const messageEl = document.getElementById('streakMessage');
+      const counterEl = document.getElementById('streakCounter');
+
+      let message = '';
+
+      if (streak === 0) {
+        // No entries ever
+        message = 'Start your streak today!';
+      } else if (!hasEntryToday && hasEntryYesterday) {
+        // Wrote yesterday but not today
+        message = `🔥 ${streak} day${streak !== 1 ? 's' : ''} — keep it going!`;
+      } else if (hasEntryToday) {
+        // Wrote today
+        if (streak === 99) {
+          message = '🔥 99 days! One less than perfect!';
+        } else if (streak >= 30) {
+          const months = Math.floor(streak / 30);
+          if (streak === 30) {
+            message = '🔥 1 month strong!';
+          } else {
+            message = `🔥 ${streak} day${streak !== 1 ? 's' : ''}!`;
+          }
+        } else if (streak === 7) {
+          message = '🔥 1 week strong!';
+        } else if (streak === 1) {
+          message = '🔥 1 day streak!';
+        } else {
+          message = `🔥 ${streak} day${streak !== 1 ? 's' : ''}!`;
+        }
+      }
+
+      messageEl.textContent = message;
+
+      // Add pulse animation if requested
+      if (animate) {
+        counterEl.classList.remove('pulse');
+        // Force reflow to restart animation
+        void counterEl.offsetWidth;
+        counterEl.classList.add('pulse');
+
+        setTimeout(() => {
+          counterEl.classList.remove('pulse');
+        }, 600);
+      }
+    }
 
     // Scroll shadow effect for sticky header
     window.addEventListener('scroll', function() {
@@ -946,7 +1125,10 @@
       
       // Refresh display
       displayEntries();
-      
+
+      // Update streak counter with animation
+      updateStreakDisplay(true);
+
       alert('✅ Entry saved successfully!');
     }
 
@@ -1039,6 +1221,9 @@
       // Refresh display
       displayEntries();
 
+      // Update streak counter (no animation for edits)
+      updateStreakDisplay();
+
       alert('✅ Entry updated successfully!');
     }
 
@@ -1060,6 +1245,9 @@
       localStorage.setItem('diaryEntries', JSON.stringify(entries));
 
       displayEntries();
+
+      // Update streak counter (deleting might break the streak)
+      updateStreakDisplay();
 
       alert('🗑️ Entry deleted!');
     }
@@ -1175,6 +1363,7 @@
 
     // Load entries when page loads
     displayEntries();
+    updateStreakDisplay();
   </script>
 </body>
 </html>
