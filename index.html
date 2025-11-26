@@ -1,500 +1,572 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Your day in ninety-nine words. One less than perfect, just like life."
-    />
-    <title>NinetyNine Words</title>
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📔</text></svg>"
-    />
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Your day in ninety-nine words. One less than perfect, just like life.">
+  <title>NinetyNine Words</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📔</text></svg>">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    h1 { 
+      color: #333;
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    
+    .tagline {
+      color: #666;
+      font-size: 16px;
+    }
+    
+    .tagline strong {
+      color: #764ba2;
+    }
+    
+    .write-section {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
 
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        padding: 20px;
-      }
+    .search-section {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
 
-      .container {
-        max-width: 700px;
-        margin: 0 auto;
-      }
+    .search-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
 
-      .header {
-        background: white;
-        padding: 30px;
-        border-radius: 16px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-        text-align: center;
-      }
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      font-size: 18px;
+      pointer-events: none;
+      color: #999;
+    }
 
-      h1 {
-        color: #333;
-        font-size: 32px;
-        margin-bottom: 10px;
-      }
+    #searchInput {
+      width: 100%;
+      padding: 12px 45px 12px 45px;
+      font-size: 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
 
-      .tagline {
-        color: #666;
-        font-size: 16px;
-      }
+    #searchInput:focus {
+      outline: none;
+      border-color: #667eea;
+    }
 
-      .tagline strong {
-        color: #764ba2;
-      }
+    .clear-search {
+      position: absolute;
+      right: 15px;
+      background: #f0f0f0;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      transition: all 0.2s;
+    }
 
-      .write-section {
-        background: white;
-        padding: 30px;
-        border-radius: 16px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-      }
+    .clear-search:hover {
+      background: #e0e0e0;
+      color: #333;
+    }
 
-      .mood-selector {
-        margin-bottom: 20px;
-        text-align: center;
-      }
+    .clear-search.visible {
+      display: flex;
+    }
 
-      .mood-label {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 10px;
-        font-weight: 600;
-      }
+    .search-results {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    }
 
-      .mood-buttons {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        flex-wrap: wrap;
-      }
+    .search-results.no-results {
+      color: #f5576c;
+    }
 
-      .mood-btn {
-        font-size: 32px;
-        padding: 10px 15px;
-        border: 3px solid #e0e0e0;
-        border-radius: 12px;
-        background: white;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
+    .mood-selector {
+      margin-bottom: 20px;
+      text-align: center;
+    }
 
-      .mood-btn:hover {
-        transform: scale(1.1);
-        border-color: #667eea;
-      }
+    .mood-label {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
 
-      .mood-btn.selected {
-        border-color: #667eea;
-        background: #f0f4ff;
-        transform: scale(1.15);
-      }
+    .mood-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
 
-      textarea {
-        width: 100%;
-        height: 150px;
-        font-size: 16px;
-        padding: 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 12px;
-        font-family: inherit;
-        resize: vertical;
-        transition: border-color 0.3s;
-      }
+    .mood-btn {
+      font-size: 32px;
+      padding: 10px 15px;
+      border: 3px solid #e0e0e0;
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
 
-      textarea:focus {
-        outline: none;
-        border-color: #667eea;
-      }
+    .mood-btn:hover {
+      transform: scale(1.1);
+      border-color: #667eea;
+    }
 
-      .word-count {
-        color: #666;
-        margin-top: 8px;
-        font-size: 14px;
-      }
+    .mood-btn.selected {
+      border-color: #667eea;
+      background: #f0f4ff;
+      transform: scale(1.15);
+    }
+    
+    textarea { 
+      width: 100%; 
+      height: 150px; 
+      font-size: 16px; 
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-family: inherit;
+      resize: vertical;
+      transition: border-color 0.3s;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .word-count { 
+      color: #666; 
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    
+    .warning { 
+      color: #f5576c;
+      font-weight: bold;
+    }
+    
+    .save-btn { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; 
+      padding: 14px 35px; 
+      border: none; 
+      border-radius: 12px; 
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+    
+    .save-btn:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .save-btn:active {
+      transform: translateY(0);
+    }
+    
+    .entries { 
+      margin-top: 20px;
+    }
+    
+    .entries-header {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 16px;
+      margin-bottom: 15px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .entries-header h2 {
+      color: #333;
+      font-size: 24px;
+    }
+    
+    .entry { 
+      background: white;
+      padding: 25px; 
+      margin: 15px 0; 
+      border-radius: 16px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      border-left: 5px solid #667eea;
+      transition: transform 0.2s;
+    }
+    
+    .entry:hover {
+      transform: translateX(5px);
+    }
+    
+    .entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-      .warning {
-        color: #f5576c;
-        font-weight: bold;
-      }
+    .entry-date { 
+      color: #999; 
+      font-size: 13px; 
+      font-weight: 600;
+    }
 
-      .save-btn {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 14px 35px;
-        border: none;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        margin-top: 15px;
-        transition: transform 0.2s, box-shadow 0.2s;
-        width: 100%;
-      }
+    .entry-mood {
+      font-size: 24px;
+    }
 
-      .save-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-      }
+    .delete-btn {
+      background: #ff4757;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
 
-      .save-btn:active {
-        transform: translateY(0);
-      }
+    .delete-btn:hover {
+      background: #ee5a6f;
+      transform: scale(1.05);
+    }
+    
+    .entry-text {
+      color: #333;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+    
+    .no-entries {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      text-align: center;
+      color: #999;
+      font-style: italic;
+    }
 
-      .entries {
-        margin-top: 20px;
-      }
-
-      .entries-header {
-        background: white;
-        padding: 20px 30px;
-        border-radius: 16px;
-        margin-bottom: 15px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-      }
-
-      .entries-header h2 {
-        color: #333;
-        font-size: 24px;
-      }
-
-      .entry {
-        background: white;
-        padding: 25px;
-        margin: 15px 0;
-        border-radius: 16px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        border-left: 5px solid #667eea;
-        transition: transform 0.2s;
-      }
-
-      .entry:hover {
-        transform: translateX(5px);
-      }
-
-      .entry-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-
-      .entry-date {
-        color: #999;
-        font-size: 13px;
-        font-weight: 600;
-      }
-
-      .entry-mood {
-        font-size: 24px;
-      }
-
-      .delete-btn {
-        background: #ff4757;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .delete-btn:hover {
-        background: #ee5a6f;
-        transform: scale(1.05);
-      }
-
-      .entry-text {
-        color: #333;
-        line-height: 1.6;
-        font-size: 15px;
-      }
-
-      .no-entries {
-        background: white;
-        padding: 40px;
-        border-radius: 16px;
-        text-align: center;
-        color: #999;
-        font-style: italic;
-      }
-
-      .footer {
-        text-align: center;
-        color: white;
-        padding: 20px;
-        opacity: 0.8;
-        font-size: 14px;
-        margin-top: 40px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="header">
-        <h1>📔 NinetyNine Words</h1>
-        <p class="tagline">
-          Your day in ninety-nine words.<br /><strong
-            >One less than perfect, just like life.</strong
-          >
-        </p>
-      </div>
-
-      <div class="write-section">
-        <div class="mood-selector">
-          <div class="mood-label">How are you feeling today?</div>
-          <div class="mood-buttons">
-            
-            <button
-              type="button"
-              class="mood-btn"
-              data-mood="😊"
-              onclick="selectMood('😊')"
-              title="Happy"
-            >
-              😊
-            </button>
-
-            <button
-            type="button"
-            class="mood-btn"
-            data-mood="🤔"
-            onclick="selectMood('🤔')"
-            title="Thoughtful"
-          >
-            🤔
-          </button>
-
-          <button
-          type="button"
-          class="mood-btn"
-          data-mood="😐"
-          onclick="selectMood('😐')"
-          title="Neutral"
-        >
-          😐
-        </button>
-
-        <button
-              type="button"
-              class="mood-btn"
-              data-mood="😴"
-              onclick="selectMood('😴')"
-              title="Tired"
-            >
-              😴
-            </button>
-
-            <button
-            type="button"
-            class="mood-btn"
-            data-mood="😤"
-            onclick="selectMood('😤')"
-            title="Angry"
-          >
-            😤
-          </button>
-
-            <button
-              type="button"
-              class="mood-btn"
-              data-mood="😢"
-              onclick="selectMood('😢')"
-              title="Sad"
-            >
-              😢
-            </button>
-          </div>
-        </div>
-
-        <textarea
-          id="diaryEntry"
-          placeholder="How was your day? What happened? How did you feel?"
-        ></textarea>
-        <div class="word-count" id="wordCount">0 / 99 words</div>
-        <button class="save-btn" onclick="saveEntry()">💾 Save Entry</button>
-      </div>
-
-      <div class="entries" id="entriesList"></div>
-
-      <div class="footer">
-        NinetyNine Words - 99 words or less. One less than perfect.
-      </div>
+    .footer {
+      text-align: center;
+      color: white;
+      padding: 20px;
+      opacity: 0.8;
+      font-size: 14px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📔 NinetyNine Words</h1>
+      <p class="tagline">Your day in ninety-nine words.<br><strong>One less than perfect, just like life.</strong></p>
     </div>
 
-    <script>
-      let selectedMood = null;
+    <div class="write-section">
+      <div class="mood-selector">
+        <div class="mood-label">How are you feeling today?</div>
+        <div class="mood-buttons">
+          <button type="button" class="mood-btn" data-mood="😊" onclick="selectMood('😊')" title="Happy">😊</button>
+          <button type="button" class="mood-btn" data-mood="🤔" onclick="selectMood('🤔')" title="Thoughtful">🤔</button>
+          <button type="button" class="mood-btn" data-mood="😐" onclick="selectMood('😐')" title="Neutral">😐</button>
+          <button type="button" class="mood-btn" data-mood="😴" onclick="selectMood('😴')" title="Tired">😴</button>
+          <button type="button" class="mood-btn" data-mood="😤" onclick="selectMood('😤')" title="Angry">😤</button>
+          <button type="button" class="mood-btn" data-mood="😢" onclick="selectMood('😢')" title="Sad">😢</button>
+        </div>
+      </div>
 
-      // Select mood when user clicks emoji
-      function selectMood(mood) {
-        selectedMood = mood;
+      <textarea id="diaryEntry" placeholder="How was your day? What happened? How did you feel?"></textarea>
+      <div class="word-count" id="wordCount">0 / 99 words</div>
+      <button class="save-btn" onclick="saveEntry()">💾 Save Entry</button>
+    </div>
 
-        document.querySelectorAll('.mood-btn').forEach((btn) => {
-          btn.classList.remove('selected');
-        });
-        event.target.classList.add('selected');
+    <div class="search-section">
+      <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search your journal entries..."
+          oninput="handleSearch()"
+        />
+        <button class="clear-search" id="clearSearch" onclick="clearSearch()">✕</button>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <div class="entries" id="entriesList"></div>
+
+    <div class="footer">
+      NinetyNine Words - 99 words or less. One less than perfect.
+    </div>
+  </div>
+
+  <script>
+    let selectedMood = null;
+
+    // Select mood when user clicks emoji
+    function selectMood(mood) {
+      selectedMood = mood;
+
+      document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      event.target.classList.add('selected');
+    }
+
+    // Handle search input
+    function handleSearch() {
+      const searchInput = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('clearSearch');
+      const query = searchInput.value.trim();
+
+      // Show/hide clear button
+      if (query) {
+        clearBtn.classList.add('visible');
+      } else {
+        clearBtn.classList.remove('visible');
       }
 
-      // Count words as user types
-      document
-        .getElementById('diaryEntry')
-        .addEventListener('input', function () {
-          const text = this.value.trim();
-          const words = text === '' ? 0 : text.split(/\s+/).length;
-          const counter = document.getElementById('wordCount');
+      // Filter and display entries
+      displayEntries(query);
+    }
 
-          if (words > 99) {
-            counter.classList.add('warning');
-            counter.textContent = words + ' / 99 words - Too many words!';
-          } else {
-            counter.classList.remove('warning');
-            counter.textContent = words + ' / 99 words';
-          }
-        });
+    // Clear search
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('clearSearch').classList.remove('visible');
+      document.getElementById('searchResults').textContent = '';
+      displayEntries();
+    }
 
-      // Save entry to localStorage
-      function saveEntry() {
-        const text = document.getElementById('diaryEntry').value.trim();
-        const words = text === '' ? 0 : text.split(/\s+/).length;
+    // Highlight search terms in text
+    function highlightText(text, query) {
+      if (!query) return text;
 
-        // Validation
-        if (text === '') {
-          alert('✍️ Write something first!');
-          return;
-        }
+      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return text.replace(regex, '<mark style="background-color: #fff176; padding: 2px 0; border-radius: 2px;">$1</mark>');
+    }
 
-        if (words > 99) {
-          alert('📝 Please keep it under 99 words!');
-          return;
-        }
+    // Count words as user types
+    document.getElementById('diaryEntry').addEventListener('input', function() {
+      const text = this.value.trim();
+      const words = text === '' ? 0 : text.split(/\s+/).length;
+      const counter = document.getElementById('wordCount');
+      
+      if (words > 99) {
+        counter.classList.add('warning');
+        counter.textContent = words + ' / 99 words - Too many words!';
+      } else {
+        counter.classList.remove('warning');
+        counter.textContent = words + ' / 99 words';
+      }
+    });
 
-        if (!selectedMood) {
-          alert('😊 Pick a mood first!');
-          return;
-        }
-
-        // Get existing entries
-        let entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
-
-        // Create new entry
-        const newEntry = {
-          id: Date.now(),
-          text: text,
-          mood: selectedMood,
-          timestamp: new Date().toISOString(),
-          date: new Date().toLocaleString('en-US', {
-            weekday: 'short',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-          }),
-          words: words,
-        };
-
-        // Add to beginning of array
-        entries.unshift(newEntry);
-
-        // Save to localStorage
-        localStorage.setItem('diaryEntries', JSON.stringify(entries));
-
-        // Clear form
-        document.getElementById('diaryEntry').value = '';
-        document.getElementById('wordCount').textContent = '0 / 99 words';
-        selectedMood = null;
-        document.querySelectorAll('.mood-btn').forEach((btn) => {
-          btn.classList.remove('selected');
-        });
-
-        // Refresh display
-        displayEntries();
-
-        alert('✅ Entry saved successfully!');
+    // Save entry to localStorage
+    function saveEntry() {
+      const text = document.getElementById('diaryEntry').value.trim();
+      const words = text === '' ? 0 : text.split(/\s+/).length;
+      
+      // Validation
+      if (text === '') {
+        alert('✍️ Write something first!');
+        return;
+      }
+      
+      if (words > 99) {
+        alert('📝 Please keep it under 99 words!');
+        return;
       }
 
-      // Delete entry
-      function deleteEntry(id) {
-        if (!confirm('Are you sure you want to delete this entry?')) {
-          return;
-        }
+      if (!selectedMood) {
+        alert('😊 Pick a mood first!');
+        return;
+      }
+      
+      // Get existing entries
+      let entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+      
+      // Create new entry
+      const newEntry = {
+        id: Date.now(),
+        text: text,
+        mood: selectedMood,
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleString('en-US', { 
+          weekday: 'short',
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        words: words
+      };
+      
+      // Add to beginning of array
+      entries.unshift(newEntry);
+      
+      // Save to localStorage
+      localStorage.setItem('diaryEntries', JSON.stringify(entries));
+      
+      // Clear form
+      document.getElementById('diaryEntry').value = '';
+      document.getElementById('wordCount').textContent = '0 / 99 words';
+      selectedMood = null;
+      document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      
+      // Refresh display
+      displayEntries();
+      
+      alert('✅ Entry saved successfully!');
+    }
 
-        let entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
-        entries = entries.filter((entry) => entry.id !== id);
-        localStorage.setItem('diaryEntries', JSON.stringify(entries));
-
-        displayEntries();
-
-        alert('🗑️ Entry deleted!');
+    // Delete entry
+    function deleteEntry(id) {
+      if (!confirm('Are you sure you want to delete this entry?')) {
+        return;
       }
 
-      // Display all entries
-      function displayEntries() {
-        const entries = JSON.parse(
-          localStorage.getItem('diaryEntries') || '[]'
+      let entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+      entries = entries.filter(entry => entry.id !== id);
+      localStorage.setItem('diaryEntries', JSON.stringify(entries));
+      
+      displayEntries();
+      
+      alert('🗑️ Entry deleted!');
+    }
+
+    // Display all entries
+    function displayEntries(searchQuery = '') {
+      const allEntries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+      const container = document.getElementById('entriesList');
+      const searchResultsDiv = document.getElementById('searchResults');
+
+      // Filter entries based on search query
+      let entries = allEntries;
+      if (searchQuery) {
+        entries = allEntries.filter(entry =>
+          entry.text.toLowerCase().includes(searchQuery.toLowerCase())
         );
-        const container = document.getElementById('entriesList');
+      }
 
+      // Update search results message
+      if (searchQuery) {
         if (entries.length === 0) {
-          container.innerHTML = `
+          searchResultsDiv.textContent = 'No entries match your search';
+          searchResultsDiv.classList.add('no-results');
+        } else {
+          searchResultsDiv.textContent = `${entries.length} result${entries.length !== 1 ? 's' : ''} found`;
+          searchResultsDiv.classList.remove('no-results');
+        }
+      } else {
+        searchResultsDiv.textContent = '';
+        searchResultsDiv.classList.remove('no-results');
+      }
+
+      if (allEntries.length === 0) {
+        container.innerHTML = `
           <div class="no-entries">
             No entries yet. Start writing!
           </div>
         `;
-          return;
-        }
+        return;
+      }
 
-        container.innerHTML =
-          `
+      if (entries.length === 0 && searchQuery) {
+        container.innerHTML = `
+          <div class="entries-header">
+            <h2>📖 Your Journal</h2>
+          </div>
+          <div class="no-entries">
+            No entries match your search. Try different keywords!
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
         <div class="entries-header">
           <h2>📖 Your Journal</h2>
         </div>
-      ` +
-          entries
-            .map(
-              (entry) => `
+      ` + entries.map(entry => `
         <div class="entry">
           <div class="entry-header">
             <div>
               <div class="entry-date">${entry.date} • ${entry.words} words</div>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
-              ${
-                entry.mood
-                  ? `<span class="entry-mood">${entry.mood}</span>`
-                  : ''
-              }
-              <button class="delete-btn" onclick="deleteEntry(${
-                entry.id
-              })">🗑️ Delete</button>
+              ${entry.mood ? `<span class="entry-mood">${entry.mood}</span>` : ''}
+              <button class="delete-btn" onclick="deleteEntry(${entry.id})">🗑️ Delete</button>
             </div>
           </div>
-          <div class="entry-text">${entry.text}</div>
+          <div class="entry-text">${highlightText(entry.text, searchQuery)}</div>
         </div>
-      `
-            )
-            .join('');
-      }
+      `).join('');
+    }
 
-      // Load entries when page loads
-      displayEntries();
-    </script>
-  </body>
+    // Load entries when page loads
+    displayEntries();
+  </script>
+</body>
 </html>
-
