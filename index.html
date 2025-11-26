@@ -57,6 +57,80 @@
       margin-bottom: 20px;
     }
 
+    .search-section {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .search-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      font-size: 18px;
+      pointer-events: none;
+      color: #999;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 12px 45px 12px 45px;
+      font-size: 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+
+    #searchInput:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .clear-search {
+      position: absolute;
+      right: 15px;
+      background: #f0f0f0;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      transition: all 0.2s;
+    }
+
+    .clear-search:hover {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .clear-search.visible {
+      display: flex;
+    }
+
+    .search-results {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .search-results.no-results {
+      color: #f5576c;
+    }
+
     .mood-selector {
       margin-bottom: 20px;
       text-align: center;
@@ -264,6 +338,20 @@
       <button class="save-btn" onclick="saveEntry()">💾 Save Entry</button>
     </div>
 
+    <div class="search-section">
+      <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search your journal entries..."
+          oninput="handleSearch()"
+        />
+        <button class="clear-search" id="clearSearch" onclick="clearSearch()">✕</button>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
     <div class="entries" id="entriesList"></div>
 
     <div class="footer">
@@ -277,11 +365,44 @@
     // Select mood when user clicks emoji
     function selectMood(mood) {
       selectedMood = mood;
-      
+
       document.querySelectorAll('.mood-btn').forEach(btn => {
         btn.classList.remove('selected');
       });
       event.target.classList.add('selected');
+    }
+
+    // Handle search input
+    function handleSearch() {
+      const searchInput = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('clearSearch');
+      const query = searchInput.value.trim();
+
+      // Show/hide clear button
+      if (query) {
+        clearBtn.classList.add('visible');
+      } else {
+        clearBtn.classList.remove('visible');
+      }
+
+      // Filter and display entries
+      displayEntries(query);
+    }
+
+    // Clear search
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('clearSearch').classList.remove('visible');
+      document.getElementById('searchResults').textContent = '';
+      displayEntries();
+    }
+
+    // Highlight search terms in text
+    function highlightText(text, query) {
+      if (!query) return text;
+
+      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return text.replace(regex, '<mark style="background-color: #fff176; padding: 2px 0; border-radius: 2px;">$1</mark>');
     }
 
     // Count words as user types
@@ -376,11 +497,34 @@
     }
 
     // Display all entries
-    function displayEntries() {
-      const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+    function displayEntries(searchQuery = '') {
+      const allEntries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
       const container = document.getElementById('entriesList');
-      
-      if (entries.length === 0) {
+      const searchResultsDiv = document.getElementById('searchResults');
+
+      // Filter entries based on search query
+      let entries = allEntries;
+      if (searchQuery) {
+        entries = allEntries.filter(entry =>
+          entry.text.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+
+      // Update search results message
+      if (searchQuery) {
+        if (entries.length === 0) {
+          searchResultsDiv.textContent = 'No entries match your search';
+          searchResultsDiv.classList.add('no-results');
+        } else {
+          searchResultsDiv.textContent = `${entries.length} result${entries.length !== 1 ? 's' : ''} found`;
+          searchResultsDiv.classList.remove('no-results');
+        }
+      } else {
+        searchResultsDiv.textContent = '';
+        searchResultsDiv.classList.remove('no-results');
+      }
+
+      if (allEntries.length === 0) {
         container.innerHTML = `
           <div class="no-entries">
             No entries yet. Start writing!
@@ -388,7 +532,19 @@
         `;
         return;
       }
-      
+
+      if (entries.length === 0 && searchQuery) {
+        container.innerHTML = `
+          <div class="entries-header">
+            <h2>📖 Your Journal</h2>
+          </div>
+          <div class="no-entries">
+            No entries match your search. Try different keywords!
+          </div>
+        `;
+        return;
+      }
+
       container.innerHTML = `
         <div class="entries-header">
           <h2>📖 Your Journal</h2>
@@ -404,7 +560,7 @@
               <button class="delete-btn" onclick="deleteEntry(${entry.id})">🗑️ Delete</button>
             </div>
           </div>
-          <div class="entry-text">${entry.text}</div>
+          <div class="entry-text">${highlightText(entry.text, searchQuery)}</div>
         </div>
       `).join('');
     }
