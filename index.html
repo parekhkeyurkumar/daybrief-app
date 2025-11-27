@@ -821,6 +821,34 @@
       margin-top: 4px;
     }
 
+    /* Insights summary sentence */
+    .insights-summary {
+      background: linear-gradient(135deg, #FFF9E6 0%, #FFF4D6 100%);
+      border: 2px solid rgba(255, 193, 7, 0.3);
+      border-radius: 16px;
+      padding: 24px 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.1);
+    }
+
+    .insights-summary-text {
+      font-size: 17px;
+      line-height: 1.6;
+      color: #6B5B28;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .insights-summary {
+        padding: 20px 24px;
+      }
+
+      .insights-summary-text {
+        font-size: 16px;
+      }
+    }
+
     /* Word count chart */
     .word-count-chart {
       display: flex;
@@ -1735,6 +1763,114 @@
       renderInsights();
     }
 
+    // Generate insights summary message
+    function generateInsightsSummary(entries, filter) {
+      if (entries.length === 0) {
+        return '✍️ Keep writing to unlock your personal insights and patterns!';
+      }
+
+      // Get most common mood
+      const moodStats = calculateMoodBreakdown(entries);
+      if (moodStats.length === 0) {
+        return '✍️ Keep writing to unlock your personal insights and patterns!';
+      }
+
+      const topMood = moodStats[0];
+      const moodEmoji = topMood.emoji;
+      const moodName = topMood.name;
+
+      // Get time period text
+      let timePeriod = 'lately';
+      if (filter === 'week') {
+        timePeriod = 'this week';
+      } else if (filter === 'month') {
+        timePeriod = 'this month';
+      }
+
+      // Define messages for each mood
+      const moodMessages = {
+        '😊': [ // Happy
+          `🥳 Your mood has been mostly Happy ${timePeriod} — keep celebrating the small victories!`,
+          `☀️ Lots of good vibes ${timePeriod}. Keep riding that wave!`
+        ],
+        '🤔': [ // Thoughtful
+          `💡 A reflective ${filter === 'week' ? 'week' : filter === 'month' ? 'month' : 'time'}. You've been doing a lot of deep thinking and journaling.`,
+          `🧭 Your mind's been busy exploring new ideas. Thoughtful ${filter === 'week' ? 'weeks' : filter === 'month' ? 'months' : 'days'} lead to clarity.`
+        ],
+        '😐': [ // Neutral
+          `☕️ A steady ${filter === 'week' ? 'week' : filter === 'month' ? 'month' : 'time'}. Sometimes calm, like this, is exactly what we need.`,
+          `⚖️ Balanced vibes ${timePeriod}. Neutral days matter too.`
+        ],
+        '😴': [ // Tired
+          `🌙 You've been feeling tired ${timePeriod}. Hope you're getting the deep rest you deserve.`,
+          `🌊 Exhausting ${filter === 'week' ? 'week' : filter === 'month' ? 'month' : 'time'}? Be gentle with yourself. Rest is productive too.`
+        ],
+        '😤': [ // Angry
+          `🥊 Tough ${filter === 'week' ? 'week' : filter === 'month' ? 'month' : 'time'}. It's okay to feel fired up — writing it out helps process the energy.`,
+          `💥 A lot of frustration ${timePeriod}. Venting here is a healthy step.`
+        ],
+        '😢': [ // Sad
+          `☔️ It's been a heavy ${filter === 'week' ? 'week' : filter === 'month' ? 'month' : 'time'}. Thank you for showing up and acknowledging these feelings.`,
+          `💫 Hard days ${timePeriod}. Remember, you're not alone, and it's okay to feel this way.`
+        ]
+      };
+
+      // Get random message for the mood
+      const messages = moodMessages[moodEmoji] || [`You've been feeling ${moodName} ${timePeriod}.`];
+      const baseMessage = messages[Math.floor(Math.random() * messages.length)];
+
+      // Analyze day patterns
+      let dayPatternAddition = '';
+
+      // Count entries by day of week
+      const dayCounts = {};
+      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+      entries.forEach(entry => {
+        const date = new Date(entry.timestamp);
+        const dayIndex = date.getDay();
+        const dayName = dayNames[dayIndex];
+        dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+      });
+
+      // Find most common writing day
+      let maxDay = null;
+      let maxCount = 0;
+      Object.keys(dayCounts).forEach(day => {
+        if (dayCounts[day] > maxCount) {
+          maxCount = dayCounts[day];
+          maxDay = day;
+        }
+      });
+
+      // Add day pattern if significant (more than 30% of entries on one day)
+      if (maxDay && maxCount / entries.length > 0.3 && entries.length >= 5) {
+        dayPatternAddition = ` You write most on ${maxDay}s — that's your reflection day.`;
+      }
+
+      // Check if weekends are happiest (only if there's happy mood data)
+      if (entries.length >= 5) {
+        const weekendEntries = entries.filter(entry => {
+          const dayIndex = new Date(entry.timestamp).getDay();
+          return dayIndex === 0 || dayIndex === 6; // Sunday or Saturday
+        });
+
+        const weekendHappyCount = weekendEntries.filter(e => e.mood === '😊').length;
+        const weekdayHappyCount = entries.filter(e => e.mood === '😊').length - weekendHappyCount;
+
+        const weekendHappyRatio = weekendEntries.length > 0 ? weekendHappyCount / weekendEntries.length : 0;
+        const weekdayHappyRatio = (entries.length - weekendEntries.length) > 0
+          ? weekdayHappyCount / (entries.length - weekendEntries.length)
+          : 0;
+
+        if (weekendHappyRatio > weekdayHappyRatio * 1.5 && weekendEntries.length >= 3) {
+          dayPatternAddition = ' Weekends seem to be your happiest time.';
+        }
+      }
+
+      return baseMessage + dayPatternAddition;
+    }
+
     // Render insights
     function renderInsights() {
       const container = document.getElementById('insightsContent');
@@ -1765,6 +1901,14 @@
       // Calculate insights
       const moodStats = calculateMoodBreakdown(filteredEntries);
       const wordPatterns = calculateWordPatterns(filteredEntries);
+
+      // Generate insights summary
+      const summaryMessage = generateInsightsSummary(filteredEntries, currentTimeFilter);
+      const summaryHTML = `
+        <div class="insights-summary">
+          <div class="insights-summary-text">${summaryMessage}</div>
+        </div>
+      `;
 
       // Build time filter buttons
       const timeFilterHTML = `
@@ -1873,7 +2017,7 @@
       `;
 
       // Combine all HTML
-      container.innerHTML = timeFilterHTML + moodBreakdownHTML + wordPatternsHTML;
+      container.innerHTML = summaryHTML + timeFilterHTML + moodBreakdownHTML + wordPatternsHTML;
     }
 
     // Load entries when page loads
