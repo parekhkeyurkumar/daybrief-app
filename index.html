@@ -893,6 +893,72 @@
       font-weight: 600;
     }
 
+    /* Week pattern chart */
+    .week-chart {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      height: 120px;
+      margin: 20px 0;
+      padding: 0 10px;
+    }
+
+    .week-bar-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .week-bar-container {
+      width: 100%;
+      max-width: 40px;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .week-bar {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 4px 4px 0 0;
+      transition: height 0.5s ease;
+      min-height: 2px;
+    }
+
+    .week-day-label {
+      font-size: 13px;
+      color: #666;
+      font-weight: 600;
+    }
+
+    .week-insights {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .week-insight-item {
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #333;
+      text-align: center;
+    }
+
+    .week-empty-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
     @media (max-width: 600px) {
       .mood-bar-label {
         min-width: 90px;
@@ -1757,6 +1823,64 @@
       };
     }
 
+    // Calculate weekly pattern
+    function calculateWeeklyPattern(entries) {
+      if (entries.length === 0) return null;
+
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const dayFullNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+      // Initialize counters
+      const dayCounts = [0, 0, 0, 0, 0, 0, 0];
+      const happyDayCounts = [0, 0, 0, 0, 0, 0, 0];
+
+      // Count entries per day of week
+      entries.forEach(entry => {
+        const date = new Date(entry.timestamp);
+        const dayOfWeek = date.getDay();
+        dayCounts[dayOfWeek]++;
+
+        if (entry.mood === '😊') {
+          happyDayCounts[dayOfWeek]++;
+        }
+      });
+
+      // Find max count for scaling bars
+      const maxCount = Math.max(...dayCounts);
+
+      // Create day data for Mon-Sun (reorder from Sun-Sat)
+      const weekData = [1, 2, 3, 4, 5, 6, 0].map(dayIndex => ({
+        name: dayNames[dayIndex],
+        fullName: dayFullNames[dayIndex],
+        count: dayCounts[dayIndex],
+        happyCount: happyDayCounts[dayIndex],
+        height: maxCount > 0 ? (dayCounts[dayIndex] / maxCount) * 100 : 0
+      }));
+
+      // Find most active day
+      let maxDayIndex = 0;
+      for (let i = 1; i < 7; i++) {
+        if (dayCounts[i] > dayCounts[maxDayIndex]) {
+          maxDayIndex = i;
+        }
+      }
+
+      // Find happiest day (most happy entries)
+      let maxHappyIndex = 0;
+      for (let i = 1; i < 7; i++) {
+        if (happyDayCounts[i] > happyDayCounts[maxHappyIndex]) {
+          maxHappyIndex = i;
+        }
+      }
+
+      return {
+        weekData,
+        mostActiveDay: dayFullNames[maxDayIndex],
+        happiestDay: happyDayCounts[maxHappyIndex] > 0 ? dayFullNames[maxHappyIndex] : null,
+        totalEntries: entries.length
+      };
+    }
+
     // Set time filter
     function setTimeFilter(filter) {
       currentTimeFilter = filter;
@@ -1901,6 +2025,7 @@
       // Calculate insights
       const moodStats = calculateMoodBreakdown(filteredEntries);
       const wordPatterns = calculateWordPatterns(filteredEntries);
+      const weeklyPattern = calculateWeeklyPattern(filteredEntries);
 
       // Generate insights summary
       const summaryMessage = generateInsightsSummary(filteredEntries, currentTimeFilter);
@@ -2016,8 +2141,72 @@
         </div>
       `;
 
+      // Build weekly pattern card
+      let weekPatternHTML = '';
+      if (weeklyPattern) {
+        weekPatternHTML = `
+          <div class="insight-card">
+            <div class="insight-card-header">Your Week 📅</div>
+            <div class="insight-card-content">
+        `;
+
+        // Check if there are enough entries
+        if (weeklyPattern.totalEntries < 7) {
+          weekPatternHTML += `
+            <div class="week-empty-message">
+              Write a few more entries to see your weekly rhythm!
+            </div>
+          `;
+        } else {
+          // Build the week chart
+          weekPatternHTML += `
+            <div class="week-chart">
+          `;
+
+          weeklyPattern.weekData.forEach(day => {
+            weekPatternHTML += `
+              <div class="week-bar-item">
+                <div class="week-bar-container">
+                  <div class="week-bar" style="height: ${day.height}%"></div>
+                </div>
+                <div class="week-day-label">${day.name}</div>
+              </div>
+            `;
+          });
+
+          weekPatternHTML += `
+            </div>
+          `;
+
+          // Add insights
+          weekPatternHTML += `
+            <div class="week-insights">
+              <div class="week-insight-item">
+                You write most on ${weeklyPattern.mostActiveDay} 📝
+              </div>
+          `;
+
+          if (weeklyPattern.happiestDay) {
+            weekPatternHTML += `
+              <div class="week-insight-item">
+                Your happiest day: ${weeklyPattern.happiestDay} 😊
+              </div>
+            `;
+          }
+
+          weekPatternHTML += `
+            </div>
+          `;
+        }
+
+        weekPatternHTML += `
+            </div>
+          </div>
+        `;
+      }
+
       // Combine all HTML
-      container.innerHTML = summaryHTML + timeFilterHTML + moodBreakdownHTML + wordPatternsHTML;
+      container.innerHTML = summaryHTML + timeFilterHTML + moodBreakdownHTML + wordPatternsHTML + weekPatternHTML;
     }
 
     // Load entries when page loads
