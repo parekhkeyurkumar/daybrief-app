@@ -929,7 +929,7 @@
       <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
       <div class="header-branding">
         <h1>📔 NinetyNine Words</h1>
-        <p class="tagline">Your day in ninety-nine words.<br><strong>One less than perfect, just like life.</strong></p>
+        <p class="tagline">Your daily journal in 99 words.<br><strong>One less than perfect, just like life.</strong></p>
       </div>
     </div>
   </div>
@@ -1498,10 +1498,10 @@
       // Update search results message
       if (searchQuery) {
         if (entries.length === 0) {
-          searchResultsDiv.textContent = 'No entries match your search';
+          searchResultsDiv.textContent = 'No memories found';
           searchResultsDiv.classList.add('no-results');
         } else {
-          searchResultsDiv.textContent = `${entries.length} result${entries.length !== 1 ? 's' : ''} found`;
+          searchResultsDiv.textContent = `${entries.length} memor${entries.length !== 1 ? 'ies' : 'y'} found`;
           searchResultsDiv.classList.remove('no-results');
         }
       } else {
@@ -1524,7 +1524,7 @@
             <h2>📅 Your Days</h2>
           </div>
           <div class="no-entries">
-            No entries match your search. Try different keywords!
+            No memories match. Try different words?
           </div>
         `;
         return;
