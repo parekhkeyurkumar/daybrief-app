@@ -1943,56 +1943,8 @@
       const messages = moodMessages[moodEmoji] || [`You've been feeling ${moodName} ${timePeriod}.`];
       const baseMessage = messages[Math.floor(Math.random() * messages.length)];
 
-      // Analyze day patterns
-      let dayPatternAddition = '';
-
-      // Count entries by day of week
-      const dayCounts = {};
-      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-      entries.forEach(entry => {
-        const date = new Date(entry.timestamp);
-        const dayIndex = date.getDay();
-        const dayName = dayNames[dayIndex];
-        dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
-      });
-
-      // Find most common writing day
-      let maxDay = null;
-      let maxCount = 0;
-      Object.keys(dayCounts).forEach(day => {
-        if (dayCounts[day] > maxCount) {
-          maxCount = dayCounts[day];
-          maxDay = day;
-        }
-      });
-
-      // Add day pattern if significant (more than 30% of entries on one day)
-      if (maxDay && maxCount / entries.length > 0.3 && entries.length >= 5) {
-        dayPatternAddition = ` You write most on ${maxDay}s — that's your reflection day.`;
-      }
-
-      // Check if weekends are happiest (only if there's happy mood data)
-      if (entries.length >= 5) {
-        const weekendEntries = entries.filter(entry => {
-          const dayIndex = new Date(entry.timestamp).getDay();
-          return dayIndex === 0 || dayIndex === 6; // Sunday or Saturday
-        });
-
-        const weekendHappyCount = weekendEntries.filter(e => e.mood === '😊').length;
-        const weekdayHappyCount = entries.filter(e => e.mood === '😊').length - weekendHappyCount;
-
-        const weekendHappyRatio = weekendEntries.length > 0 ? weekendHappyCount / weekendEntries.length : 0;
-        const weekdayHappyRatio = (entries.length - weekendEntries.length) > 0
-          ? weekdayHappyCount / (entries.length - weekendEntries.length)
-          : 0;
-
-        if (weekendHappyRatio > weekdayHappyRatio * 1.5 && weekendEntries.length >= 3) {
-          dayPatternAddition = ' Weekends seem to be your happiest time.';
-        }
-      }
-
-      return baseMessage + dayPatternAddition;
+      // Return only the mood message (day patterns now shown in Your Week card)
+      return baseMessage;
     }
 
     // Render insights
